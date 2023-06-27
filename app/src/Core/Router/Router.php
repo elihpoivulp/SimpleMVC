@@ -145,6 +145,14 @@ class Router
         return $this;
     }
 
+    public function addRouteGroup(array $routes, string $groupName = '', string|BaseController $commonController = '', string $namespace = ''): static
+    {
+        foreach ($routes as $route) {
+            $this->registerRoute($route, $groupName, $commonController, $namespace);
+        }
+        return $this;
+    }
+
     /**
      * @param Route $route
      * @param string $group

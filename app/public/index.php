@@ -1,5 +1,6 @@
 <?php
 
+use Simplemvc\ControllerDummy\DummyController;
 use Simplemvc\Core\Request;
 use Simplemvc\Core\Router\Route;
 use Simplemvc\Core\Router\RouteCollection;
@@ -13,15 +14,8 @@ $request = Request::init();
 $router = new Router(new RouteCollection());
 $router->addRoute(Route::new(''));
 $router->addRoute(Route::new('about')->setAction('about'));
-$router->addRoute(
-    Route::new('dummy')
-        ->setController('DummyController')
-        ->setNamespace('Simplemvc\ControllerDummy')
-);
-$router->addRoute(
-    Route::new('dummy/test-page/{welcome:\w+}')
-        ->setController('DummyController')
-        ->setAction('testPage')
-        ->setNamespace('Simplemvc\ControllerDummy')
-);
+$router->addRouteGroup([
+    Route::new(),
+    Route::new('test-page/{welcome:\w+}')->setAction('testPage')
+], 'dummy', DummyController::class);
 $router->dispatch($request);
