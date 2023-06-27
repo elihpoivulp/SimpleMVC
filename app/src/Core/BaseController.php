@@ -4,7 +4,7 @@ namespace Simplemvc\Core;
 
 abstract class BaseController
 {
-    public function __construct()
+    public function __construct(protected Request $request)
     {
     }
 

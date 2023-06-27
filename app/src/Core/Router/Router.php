@@ -63,7 +63,7 @@ class Router
         // show 404 if route is not found on the collection.
         if (!$this->routeExists($this->currentPath)) exit('404: Page does not exist');
         try {
-            $controller = $this->getMatchedRouteController();
+            $controller = $this->getMatchedRouteController($request);
             $action = $this->getMatchedRouteAction();
             call_user_func_array([$controller, $action], $this->matchedRoute->getParams());
         } catch (BadControllerException|ArgumentCountError|TypeError $e) {
@@ -81,7 +81,7 @@ class Router
      * the property values.
      * @throws BadControllerException
      */
-    protected function getMatchedRouteController(): BaseController
+    protected function getMatchedRouteController(Request $request): BaseController
     {
         $params = $this->matchedRoute->getParams();
         if (key_exists(Config::$termForControllers, $params)) {
@@ -108,7 +108,7 @@ class Router
         }
 
         // instantiate the controller
-        return new $controller();
+        return new $controller($request);
     }
 
     /**
