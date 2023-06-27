@@ -63,7 +63,7 @@ class Route
      * @return static
      * Returns an instantiated Route.
      */
-    public static function new(string $route): static
+    public static function new(string $route = ''): static
     {
         return new static($route);
     }
