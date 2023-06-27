@@ -1,0 +1,17 @@
+{
+    "name": "nicko/simplemvc",
+    "description": "A simple PHP MVC framework",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Simplemvc\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nicko",
+            "email": "p.nickogamba@gmail.com"
+        }
+    ],
+    "require": {}
+}

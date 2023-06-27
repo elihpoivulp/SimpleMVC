@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      dockerfile: ./docker/php/Dockerfile
+      target: app_dev
+    volumes:
+      - ./app:/var/www/html/
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
+    environment:
+      XDEBUG_MODE: debug
+
+  server:
+    build:
+      dockerfile: ./docker/nginx/Dockerfile
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  db:
+    ports:
+      - 3306:3306
+    restart: unless-stopped
