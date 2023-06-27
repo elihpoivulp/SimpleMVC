@@ -6,6 +6,7 @@ use Exception;
 use Simplemvc\Config\Config;
 use Simplemvc\Core\BaseController;
 use Simplemvc\Core\Request;
+use Simplemvc\Exceptions\BadControllerException;
 
 class Router
 {
@@ -64,7 +65,7 @@ class Router
             $controller = $this->getMatchedRouteController();
             $action = $this->getMatchedRouteAction();
             call_user_func_array([$controller, $action], $this->matchedRoute->getParams());
-        } catch (Exception $e) {
+        } catch (BadControllerException $e) {
             exit($e->getMessage());
         }
     }
@@ -77,7 +78,7 @@ class Router
      * defined in its assigned route URI.
      * Controller and method defined the route URI will take precedence over
      * the property values.
-     * @throws Exception
+     * @throws BadControllerException
      */
     protected function getMatchedRouteController(): BaseController
     {
@@ -106,7 +107,7 @@ class Router
         }
         $controller = ucfirst($controller);
         if (!class_exists($controller)) {
-            throw new Exception("Controller \"$controller\" does not exist.");
+            throw new BadControllerException("Controller \"$controller\" does not exist.");
         }
 
         // instantiate the controller
