@@ -2,11 +2,12 @@
 
 namespace Simplemvc\Core\Router;
 
-use Exception;
+use ArgumentCountError;
 use Simplemvc\Config\Config;
 use Simplemvc\Core\BaseController;
 use Simplemvc\Core\Request;
 use Simplemvc\Exceptions\BadControllerException;
+use TypeError;
 
 class Router
 {
@@ -65,8 +66,8 @@ class Router
             $controller = $this->getMatchedRouteController();
             $action = $this->getMatchedRouteAction();
             call_user_func_array([$controller, $action], $this->matchedRoute->getParams());
-        } catch (BadControllerException $e) {
-            exit($e->getMessage());
+        } catch (BadControllerException|ArgumentCountError|TypeError $e) {
+            exit('<strong>404</strong>: ' . $e->getMessage());
         }
     }
 
@@ -88,12 +89,8 @@ class Router
 
             // if the controller found on the URI is written like "some-page",
             // it will be converted to proper class name (camel case);  SomePage
-            if (strpos($controller, '-')) {
-                $controller = join(array_map(function($word) {
-                    return ucfirst($word);
-                }, explode('-', $controller)));
-            }
-            // unset the param from the array so it does not get passed to the method
+            $controller = $this->toCamelCase($controller);
+            // unset the param from the array, so it does not get passed to the method
             unset($params[Config::$termForControllers]);
             $this->matchedRoute->setParams($params);
         } else {
@@ -126,7 +123,7 @@ class Router
             // if the action found on the URI is written like "some-action",
             // it will be converted to proper method name (studly case);  someAction
             if (strpos($action, '-')) {
-                $action = str_replace('-', '_', $action);
+                $action = $this->toStudlyCaps($action);
             }
             unset($params[Config::$termForActions]);
             $this->matchedRoute->setParams($params);
@@ -181,6 +178,8 @@ class Router
      */
     protected function routeExists(string $path): bool
     {
+        $this->setDynamicRouting();
+
         foreach ($this->routes as $route) {
             if ($route->pathMatchesRoute($path)) {
                 $this->matchedRoute = $route;
@@ -219,5 +218,23 @@ class Router
     protected function hasNamespacePresence(string $controller): bool
     {
         return str_contains($controller, '\\');
+    }
+
+    protected function toStudlyCaps(string $str): string
+    {
+        return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $str)));
+    }
+
+    protected function toCamelCase(string $str): string
+    {
+        return lcfirst($this->toStudlyCaps($str));
+    }
+
+    private function setDynamicRouting(): void
+    {
+        if (Config::$allowDynamicRouting) {
+            $this->addRoute(Route::new('{controller}'));
+            $this->addRoute(Route::new('{controller}/{action}'));
+        }
     }
 }
