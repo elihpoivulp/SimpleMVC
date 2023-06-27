@@ -30,7 +30,7 @@ class Request
      */
     public function getPathInfo(): string
     {
-        return strtok($this->uri);
+        return strtok($this->uri, '?');
     }
 
     public function getUri(): string
