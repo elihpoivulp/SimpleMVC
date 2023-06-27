@@ -7,5 +7,5 @@ function to_dir(array $items, $sep = DS): string
     return join($sep, $items);
 }
 
-require_once to_dir([APP_PATH, 'src', 'config', 'constants.php']);
 require_once to_dir([APP_PATH, 'vendor', 'autoload.php']);
+require_once to_dir([APP_PATH, 'src', 'Config', 'constants.php']);
