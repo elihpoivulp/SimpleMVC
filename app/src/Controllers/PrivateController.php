@@ -2,9 +2,9 @@
 
 namespace Simplemvc\Controllers;
 
-use Simplemvc\Core\BaseController;
+use Simplemvc\Core\Controller;
 
-class PrivateController extends BaseController
+class PrivateController extends Controller
 {
     public function privateMethod(): void
     {

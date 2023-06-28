@@ -3,8 +3,10 @@
 namespace Simplemvc\Core\Router;
 
 use ArgumentCountError;
+use Exception;
 use Simplemvc\Config\Config;
-use Simplemvc\Core\BaseController;
+use Simplemvc\Core\Controller;
+use Simplemvc\Core\Helper;
 use Simplemvc\Core\Request;
 use Simplemvc\Exceptions\BadControllerException;
 use TypeError;
@@ -43,12 +45,11 @@ class Router
 
     public function __construct(
         protected RouteCollection $routes
-//        protected Route $route
     )
     {
         $this->defaultController = Config::$defaultController;
         $this->defaultAction = Config::$defaultActionMethod;
-        $this->defaultNamespace = Config::$defaultNamespace;
+        $this->defaultNamespace = Config::$defaultControllerNamespace;
     }
 
     /**
@@ -62,26 +63,29 @@ class Router
 
         // show 404 if route is not found on the collection.
         if (!$this->routeExists($this->currentPath)) exit('404: Page does not exist');
+
         try {
             $controller = $this->getMatchedRouteController($request);
             $action = $this->getMatchedRouteAction();
             call_user_func_array([$controller, $action], $this->matchedRoute->getParams());
-        } catch (BadControllerException|ArgumentCountError|TypeError $e) {
+        } catch (BadControllerException|ArgumentCountError|TypeError|Exception $e) {
             exit('<strong>404</strong>: ' . $e->getMessage());
         }
     }
 
     /**
      * @param Request $request
-     * @return BaseController
+     * @return Controller
+     * @throws BadControllerException
+     * @throws Exception
+     *
      * Gets the defined controller for the route.
      * If no controller property was set, it will look for the params
      * defined in its assigned route URI.
      * Controller and method defined the route URI will take precedence over
      * the property values.
-     * @throws BadControllerException
      */
-    protected function getMatchedRouteController(Request $request): BaseController
+    protected function getMatchedRouteController(Request $request): Controller
     {
         $params = $this->matchedRoute->getParams();
         if (key_exists(Config::$termForControllers, $params)) {
@@ -96,10 +100,12 @@ class Router
         } else {
             $controller = $this->matchedRoute->getController() ?: Config::$defaultController;
         }
-        $namespace = $this->matchedRoute->getNamespace() ?: Config::$defaultNamespace;
+        $namespace = $this->matchedRoute->getNamespace() ?: Config::$defaultControllerNamespace;
+
+        Helper::loadHelper('string');
 
         // check if controller contains namespace
-        if (!$this->hasNamespacePresence($controller)) {
+        if (!hasNamespacePresence($controller)) {
             $controller = $namespace . '\\' . $controller;
         }
         $controller = ucfirst($controller);
@@ -145,7 +151,7 @@ class Router
         return $this;
     }
 
-    public function addRouteGroup(array $routes, string $groupName = '', string|BaseController $commonController = '', string $namespace = ''): static
+    public function addRouteGroup(array $routes, string $groupName = '', string|Controller $commonController = '', string $namespace = ''): static
     {
         foreach ($routes as $route) {
             $this->registerRoute($route, $groupName, $commonController, $namespace);
@@ -156,13 +162,13 @@ class Router
     /**
      * @param Route $route
      * @param string $group
-     * @param string|BaseController $controller
+     * @param string|Controller $controller
      * @param string $namespace
      * @return void
      *
      * Converts the URI to regex and then appends route to the collection.
      */
-    protected function registerRoute(Route $route, string $group = '', string|BaseController $controller = '', string $namespace = ''): void
+    protected function registerRoute(Route $route, string $group = '', string|Controller $controller = '', string $namespace = ''): void
     {
         if (!empty($controller)) $route->setController($controller);
 
@@ -221,11 +227,6 @@ class Router
         // get named routes with custom regex
         $uri = preg_replace('/{([\w\-_]+):([^}]+)}/', '(?P<$1>$2)', $uri);
         return '/^' . $uri . '$/';
-    }
-
-    protected function hasNamespacePresence(string $controller): bool
-    {
-        return str_contains($controller, '\\');
     }
 
     protected function toStudlyCaps(string $str): string

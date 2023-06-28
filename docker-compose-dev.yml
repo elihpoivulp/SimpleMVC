@@ -19,3 +19,5 @@ services:
     ports:
       - 3306:3306
     restart: unless-stopped
+    volumes:
+      - ./docker/mysql:/docker-entrypoint-initdb.d

@@ -2,7 +2,7 @@
 
 namespace Simplemvc\Core\Router;
 
-use Simplemvc\Core\BaseController;
+use Simplemvc\Core\Controller;
 
 /**
  * Route model.
@@ -10,10 +10,10 @@ use Simplemvc\Core\BaseController;
 class Route
 {
     /**
-     * @var string|BaseController
+     * @var string|Controller
      * The controller file.
      */
-    protected string|BaseController $controller = '';
+    protected string|Controller $controller = '';
 
     /**
      * @var string
@@ -80,18 +80,18 @@ class Route
     }
 
     /**
-     * @return BaseController|string
+     * @return Controller|string
      */
-    public function getController(): BaseController|string
+    public function getController(): Controller|string
     {
         return $this->controller;
     }
 
     /**
-     * @param BaseController|string $controller
+     * @param Controller|string $controller
      * @return Route
      */
-    public function setController(BaseController|string $controller): static
+    public function setController(Controller|string $controller): static
     {
         $this->controller = $controller;
         return $this;

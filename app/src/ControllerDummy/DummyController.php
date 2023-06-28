@@ -2,9 +2,9 @@
 
 namespace Simplemvc\ControllerDummy;
 
-use Simplemvc\Core\BaseController;
+use Simplemvc\Core\Controller;
 
-class DummyController extends BaseController
+class DummyController extends Controller
 {
     public function index(): void
     {

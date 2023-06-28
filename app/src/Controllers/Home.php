@@ -2,21 +2,40 @@
 
 namespace Simplemvc\Controllers;
 
-use Simplemvc\Core\BaseController;
+use Exception;
+use Simplemvc\Core\Controller;
+use Simplemvc\Core\Model;
+use Simplemvc\Core\Request;
+use Simplemvc\Models\MessagesModel;
 
-class Home extends BaseController
+class Home extends Controller
 {
-    public function index(): void
+    private Model $model;
+    public function __construct(Request $request)
     {
-        echo 'Hello from home/index!<br>';
-        echo '<strong>GET params</strong>';
-        echo '<pre>';
-        print_r($this->request->getParams);
-        echo '</pre>';
+        parent::__construct($request);
+        $this->model = new MessagesModel();
     }
 
-    public function about(): void
+    /**
+     * @throws Exception
+     */
+    public function index(): void
     {
-        echo 'about';
+        echo '<h1>Messages</h1>';
+        echo '<ul>';
+        foreach ($this->model->getMessages() as $message) {
+            echo '<li>' . $message['message'] . '</li>';
+        }
+        echo '</ul>';
+
+    }
+    public function addMessage($message): void
+    {
+        if ($this->model->newMessage($message)) {
+            echo 'Message successfully added!';
+        } else {
+            echo 'Could not add message.';
+        }
     }
 }

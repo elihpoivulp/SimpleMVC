@@ -6,9 +6,10 @@ class Config
 {
     public static string $defaultController = 'Home';
     public static string $defaultActionMethod = 'index';
-    public static string $defaultNamespace = 'Simplemvc\\Controllers';
+    public static string $defaultControllerNamespace = 'Simplemvc\\Controllers';
     public static string $termForControllers = 'controller';
     public static string $termForActions = 'action';
+    public static string $defaultModelNamespace = 'Simplemvc\\Models';
     /**
      * @var bool
      * !!Warning: Dynamic routing guesses the controller and action based on the generic uri format: www.site.com/controller/method.
